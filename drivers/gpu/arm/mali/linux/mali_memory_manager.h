@@ -34,7 +34,7 @@ extern struct mutex mali_idr_mutex;
 int mali_memory_manager_init(struct mali_allocation_manager *mgr);
 void mali_memory_manager_uninit(struct mali_allocation_manager *mgr);
 
-void  mali_mem_allocation_struct_destory(mali_mem_allocation *alloc);
+void  mali_mem_allocation_struct_destroy(mali_mem_allocation *alloc);
 
 mali_mem_backend *mali_mem_backend_struct_search(struct mali_allocation_manager *mgr, u32 mali_address);
 _mali_osk_errcode_t _mali_ukk_mem_allocate(_mali_uk_alloc_mem_s *args);

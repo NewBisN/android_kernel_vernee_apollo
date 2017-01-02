@@ -39,10 +39,10 @@
 #include <linux/workqueue.h>
 
 #include <mt-plat/sync_write.h>
-#include <mt_spm.h>
+#include "mt_spm.h"
 #include <mach/mt_clkmgr.h>
 /* #include <mach/mt_gpio_core.h> */
-#include <mt_clkbuf_ctl.h>
+#include "mt_clkbuf_ctl.h"
 #include <mt-plat/upmu_common.h>
 
 #define RF_BPI_GPIO_NUM 20
@@ -575,7 +575,7 @@ void clk_buf_write_afcdac(void)
 		return;
 
 	spm_write(SPM_BSI_EN_SR, afcdac_val);
-	clk_buf_dbg("%s: afcdac=0x%x, SPM_BSI_EN_SR=0x%x, afcdac_updated=%d\n",
+	clk_buf_warn("%s: afcdac=0x%x, SPM_BSI_EN_SR=0x%x, afcdac_updated=%d\n",
 		     __func__, afcdac_val, spm_read(SPM_BSI_EN_SR),
 		     is_clkbuf_afcdac_updated);
 }

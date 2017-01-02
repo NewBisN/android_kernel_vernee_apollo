@@ -1,3 +1,15 @@
+/*
+ * Copyright (C) 2016 MediaTek Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See http://www.gnu.org/licenses/gpl-2.0.html for more details.
+ */
 /**
 * @file    mt_hotplug_strategy.h
 * @brief   hotplug strategy(hps) - external header file
@@ -64,12 +76,6 @@ extern int hps_get_num_online_cpus(unsigned int *little_cpu_ptr, unsigned int *b
 extern int hps_set_PPM_request(unsigned int little_min, unsigned int little_max,
 			       unsigned int big_min, unsigned int big_max);
 extern unsigned int hps_get_hvytsk(unsigned int cluster_id);
-#ifdef CONFIG_SCHED_DEBUG
-extern void sysrq_sched_debug_show(void);
-extern int sysrq_sched_debug_show_at_AEE(void);
-extern int aee_mode;
-#endif
-
 /*=============================================================*/
 /* End */
 /*=============================================================*/

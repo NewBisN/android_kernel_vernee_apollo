@@ -1,3 +1,15 @@
+/*
+ * Copyright (C) 2016 MediaTek Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See http://www.gnu.org/licenses/gpl-2.0.html for more details.
+ */
 /**
 * @file    mt_hotplug_strategy_core.c
 * @brief   hotplug strategy(hps) - core
@@ -19,8 +31,6 @@
 #include "mt_hotplug_strategy_internal.h"
 #include "mt_hotplug_strategy.h"
 #include <trace/events/sched.h>
-#include <mt-plat/mtk_ram_console.h>
-#include <mt-plat/aee.h>
 
 /* forward references */
 
@@ -67,7 +77,7 @@ static int _hps_timer_callback(unsigned long data)
 	if (hps_ctxt.tsk_struct_ptr) {
 		ret = wake_up_process(hps_ctxt.tsk_struct_ptr);
 		if (!ret)
-			pr_err("hps task wake up fail %d\n", ret);
+			pr_err("[INFO] hps task has waked up[%d]\n", ret);
 	} else {
 		pr_err("hps ptr is NULL\n");
 	}
@@ -138,14 +148,13 @@ static void hps_get_sysinfo(void)
 	/*Get heavy task information */
 	/*hps_ctxt.cur_nr_heavy_task = hps_cpu_get_nr_heavy_task(); */
 	for (idx = 0; idx < hps_sys.cluster_num; idx++) {
-		if (hps_ctxt.heavy_task_enabled || hps_ctxt.heavy_task_enabled_EXT)
+		if (hps_ctxt.heavy_task_enabled) {
 #ifdef CONFIG_MTK_SCHED_RQAVG_US
-			{
 			if (idx == 0) {
 				/* in cluster LL, heavy task by last_poll */
-				hps_sys.cluster_info[idx].hvyTsk_value = sched_get_nr_heavy_task_by_threshold(idx, heavy_task_threshold);
-			}
-			else if (idx == 1) {
+				hps_sys.cluster_info[idx].hvyTsk_value =
+					sched_get_nr_heavy_task_by_threshold(idx, heavy_task_threshold);
+			} else if (idx == 1) {
 				/* in cluster L, heavy task by max of average(w/o remainder) and last_poll */
 				lastpoll_htask1 = sched_get_nr_heavy_task_by_threshold(idx, heavy_task_threshold);
 				lastpoll_htask2 = sched_get_nr_heavy_running_avg(idx, &avg_htask_scal);
@@ -153,18 +162,14 @@ static void hps_get_sysinfo(void)
 				lastpoll_htask_idx1_2 = lastpoll_htask2;
 				avg_htask_scal_idx1 = avg_htask_scal;
 
-				avg_htask = ((avg_htask_scal%100) >= avg_heavy_task_threshold)?(avg_htask_scal/100+1):(avg_htask_scal/100);
+				avg_htask = ((avg_htask_scal%100)
+					>= avg_heavy_task_threshold)?(avg_htask_scal/100+1):(avg_htask_scal/100);
 
 				max_idx1 = max =  max(max(lastpoll_htask1, lastpoll_htask2), avg_htask);
 				hps_sys.cluster_info[idx].hvyTsk_value = max;
 
-				if (hps_sys.cluster_info[idx].hvyTsk_value < 0)
-					pr_warn("%s: error, wrong hvyTsk=%d in cluster1\n",
-							__func__, hps_sys.cluster_info[idx].hvyTsk_value);
-
 				trace_sched_avg_heavy_task(lastpoll_htask1, lastpoll_htask2, avg_htask_scal, idx, max);
-			}
-			else if (idx == 2) {
+			} else if (idx == 2) {
 				/* in cluster B, heavy task by max of average(with L's remainder) and last_poll */
 				lastpoll_htask1 = sched_get_nr_heavy_task_by_threshold(idx, heavy_task_threshold);
 				lastpoll_htask2 = sched_get_nr_heavy_running_avg(idx, &avg_htask_scal);
@@ -173,30 +178,26 @@ static void hps_get_sysinfo(void)
 				lastpoll_htask_idx2_2 = lastpoll_htask2 + lastpoll_htask_idx1_2;
 				avg_htask_scal_idx2 = avg_htask_scal+avg_htask_scal_idx1;
 
-				avg_htask = ((avg_htask_scal_idx2%100) >= avg_heavy_task_threshold)?(avg_htask_scal_idx2/100+1):(avg_htask_scal_idx2/100);
+				avg_htask = ((avg_htask_scal_idx2%100) >= avg_heavy_task_threshold)?(
+						avg_htask_scal_idx2/100+1):(avg_htask_scal_idx2/100);
 
 				max =  max(max(lastpoll_htask_idx2_1, lastpoll_htask_idx2_2), avg_htask);
-
 				hps_sys.cluster_info[idx].hvyTsk_value = (max - max_idx1);
 
-				if (hps_sys.cluster_info[idx].hvyTsk_value < 0)
-					pr_warn("%s: error, wrong hvyTsk=%d in cluster2(=%d-%d)\n",
-							__func__, hps_sys.cluster_info[idx].hvyTsk_value,
-							max, max_idx1);
-
-				trace_sched_avg_heavy_task(lastpoll_htask1, lastpoll_htask2, avg_htask_scal, idx, (max-max_idx1));
-			}else
+				trace_sched_avg_heavy_task(lastpoll_htask1, lastpoll_htask2, avg_htask_scal,
+						idx,
+						(max-max_idx1));
+			} else
 				BUG_ON(1);
-			}
 #else
 			hps_sys.cluster_info[idx].hvyTsk_value = 0;
 #endif
-		else
+		} else
 			hps_sys.cluster_info[idx].hvyTsk_value = 0;
 	}
-
 	/*Get sys TLP information */
 	scaled_tlp = hps_cpu_get_tlp(&avg_tlp, &hps_ctxt.cur_iowait);
+
 	/*
 	 * scaled_tlp: tasks number of the last pill, which X 100.
 	 * avg_tlp: average tasks number during the detection period.
@@ -214,6 +215,22 @@ static void hps_get_sysinfo(void)
 #endif
 }
 
+struct hrtimer cpuhp_timer;
+static int cpuhp_timer_func(unsigned long data)
+{
+	if (hps_ctxt.tsk_struct_ptr) {
+		pr_err("HPS task info (run on CPU %d)\n", task_cpu(hps_ctxt.tsk_struct_ptr));
+		if (hps_ctxt.tsk_struct_ptr->on_cpu == 0)
+			show_stack(hps_ctxt.tsk_struct_ptr, NULL);
+	} else {
+		pr_err("%s: no hps_main task\n", __func__);
+	}
+
+	BUG_ON(1);
+
+	return HRTIMER_NORESTART;
+}
+
 /*
  * hps task main loop
  */
@@ -223,6 +240,9 @@ static int _hps_task_main(void *data)
 	void (*algo_func_ptr)(void);
 
 	hps_ctxt_print_basic(1);
+
+	hrtimer_init(&cpuhp_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+	cpuhp_timer.function = (void *)&cpuhp_timer_func;
 
 	algo_func_ptr = hps_algo_main;
 
@@ -266,7 +286,10 @@ static int _hps_task_main(void *data)
 			hps_ctxt.is_interrupt = 0;
 
 		/*execute hotplug algorithm */
+		if (!hrtimer_active(&cpuhp_timer))
+			hrtimer_start(&cpuhp_timer, ns_to_ktime(CPUHP_INTERVAL), HRTIMER_MODE_REL);
 		(*algo_func_ptr) ();
+		hrtimer_cancel(&cpuhp_timer);
 
 #ifdef CONFIG_CPU_ISOLATION
 HPS_WAIT_EVENT:
@@ -288,8 +311,7 @@ HPS_WAIT_EVENT:
 				hrtimer_start(&hps_ctxt.hr_timer, ktime, HRTIMER_MODE_REL);
 				set_current_state(TASK_INTERRUPTIBLE);
 				schedule();
-			} else
-				atomic_set(&hps_ctxt.is_ondemand, 0);
+			}
 		}
 
 		if (kthread_should_stop())
@@ -340,19 +362,13 @@ void hps_task_stop(void)
 
 void hps_task_wakeup_nolock(void)
 {
-	int ret;
 	if (hps_ctxt.tsk_struct_ptr) {
 		atomic_set(&hps_ctxt.is_ondemand, 1);
 		if (hps_ctxt.periodical_by == HPS_PERIODICAL_BY_WAIT_QUEUE)
 			wake_up(&hps_ctxt.wait_queue);
 		else if ((hps_ctxt.periodical_by == HPS_PERIODICAL_BY_TIMER)
-			 || (hps_ctxt.periodical_by == HPS_PERIODICAL_BY_HR_TIMER)) {
-			ret = wake_up_process(hps_ctxt.tsk_struct_ptr);
-			if (!ret) {
-				pr_err("[%s]hps task wake up fail %d\n", __func__, ret);
-				atomic_set(&hps_ctxt.is_ondemand, 0);
-			}
-		}
+			 || (hps_ctxt.periodical_by == HPS_PERIODICAL_BY_HR_TIMER))
+			wake_up_process(hps_ctxt.tsk_struct_ptr);
 	}
 }
 

@@ -12,7 +12,7 @@
  */
 
 /*
- * BU6424AF voice coil motor driver
+ * DW9714AF voice coil motor driver
  *
  *
  */
@@ -25,7 +25,7 @@
 #include "lens_info.h"
 
 
-#define AF_DRVNAME "BU6424AF_DRV"
+#define AF_DRVNAME "BU64244GWZAF_DRV"
 #define AF_I2C_SLAVE_ADDR        0x18
 
 #define AF_DEBUG
@@ -90,49 +90,7 @@ static int s4AF_WriteReg(u16 a_u2Data)
 	return 0;
 }
 
-
-static int init_setting(void)
-{
-	int  i4RetValue = 0;
-	
-	char puSendCmd1[2]={(char)(0xD4),(char)(0x32)};//A point=50d 
-	char puSendCmd2[2]={(char)(0xDC),(char)(0x64)};//B point=100d 
-	char puSendCmd3[2]={(char)(0xE4),(char)(0x21)};//A-B point step mode:200us/4Lsd 
-	char puSendCmd4[2]={(char)(0xCC),(char)(0x4B)};//92Hz,Fast mode
-
-	LOG_INF("init_setting start 151201!!\n");
-
- i4RetValue = i2c_master_send(g_pstAF_I2Cclient, puSendCmd1, 2);	
-    if (i4RetValue < 0) 
-    {
-        LOG_INF("[BU6424AF]I2C send failed!!\n");
-		return -1;
-    }
- i4RetValue = i2c_master_send(g_pstAF_I2Cclient, puSendCmd2, 2);
-    if (i4RetValue < 0) 
-    {
-        LOG_INF("[BU6424AF]I2C send failed!!\n");
-        return -1;
-    }
- i4RetValue = i2c_master_send(g_pstAF_I2Cclient, puSendCmd3, 2);
-    if (i4RetValue < 0) 
-    {
-        LOG_INF("[BU6424AF]I2C send failed!!\n");
-        return -1;
-    }
- i4RetValue = i2c_master_send(g_pstAF_I2Cclient, puSendCmd4, 2);
-    if (i4RetValue < 0) 
-    {
-        LOG_INF("[BU6424AF]I2C send failed!!\n");
-        return -1;
-    }
-	
-    LOG_INF("init_setting end 151201!!\n");
-	return 0;
-}
-
-
-static inline int getAFInfo(__user stAF_MotorInfo * pstMotorInfo)
+static inline int getAFInfo(__user stAF_MotorInfo *pstMotorInfo)
 {
 	stAF_MotorInfo stMotorInfo;
 
@@ -157,7 +115,6 @@ static inline int getAFInfo(__user stAF_MotorInfo * pstMotorInfo)
 static inline int moveAF(unsigned long a_u4Position)
 {
 	int ret = 0;
-
 	if (g_i4DriverStatus > 2) /* I2C failed */
 		return -EINVAL;
 
@@ -170,7 +127,6 @@ static inline int moveAF(unsigned long a_u4Position)
 		unsigned short InitPos;
 
 		ret = s4AF_ReadReg(&InitPos);
-		init_setting();
 
 		if (ret == 0) {
 			LOG_INF("Init Pos %6d\n", InitPos);
@@ -228,7 +184,7 @@ static inline int setAFMacro(unsigned long a_u4Position)
 }
 
 /* ////////////////////////////////////////////////////////////// */
-long BU6424AF_Ioctl(struct file *a_pstFile, unsigned int a_u4Command, unsigned long a_u4Param)
+long BU64244GWZAF_Ioctl(struct file *a_pstFile, unsigned int a_u4Command, unsigned long a_u4Param)
 {
 	long i4RetValue = 0;
 
@@ -263,21 +219,17 @@ long BU6424AF_Ioctl(struct file *a_pstFile, unsigned int a_u4Command, unsigned l
 /* 2.Shut down the device on last close. */
 /* 3.Only called once on last time. */
 /* Q1 : Try release multiple times. */
-int BU6424AF_Release(struct inode *a_pstInode, struct file *a_pstFile)
+int BU64244GWZAF_Release(struct inode *a_pstInode, struct file *a_pstFile)
 {
 	LOG_INF("Start\n");
 
 	if (*g_pAF_Opened == 2) {
 		char puSendCmd[2];
-
 		puSendCmd[0] = (char)(0x00);
 		puSendCmd[1] = (char)(0x00);
 		i2c_master_send(g_pstAF_I2Cclient, puSendCmd, 2);
 		LOG_INF("Wait\n");
-		/*s4AF_WriteReg(200);
-		msleep(20);
 		s4AF_WriteReg(100);
-		msleep(20);*/
 	}
 
 	if (*g_pAF_Opened) {
@@ -289,13 +241,12 @@ int BU6424AF_Release(struct inode *a_pstInode, struct file *a_pstFile)
 	}
 
 	g_i4DriverStatus = 0;
-
 	LOG_INF("End\n");
 
 	return 0;
 }
 
-void BU6424AF_SetI2Cclient(struct i2c_client *pstAF_I2Cclient, spinlock_t *pAF_SpinLock, int *pAF_Opened)
+void BU64244GWZAF_SetI2Cclient(struct i2c_client *pstAF_I2Cclient, spinlock_t *pAF_SpinLock, int *pAF_Opened)
 {
 	g_pstAF_I2Cclient = pstAF_I2Cclient;
 	g_pAF_SpinLock = pAF_SpinLock;

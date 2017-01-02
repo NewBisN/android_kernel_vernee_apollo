@@ -1,15 +1,14 @@
 /*
- * Copyright (c) 2015 MediaTek Inc.
+ * Copyright (C) 2016 MediaTek Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See http://www.gnu.org/licenses/gpl-2.0.html for more details.
  */
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -145,8 +144,6 @@ PROC_FOPS_RO_UINT(state, hps_ctxt.state);
 PROC_FOPS_RW_UINT(enabled, hps_ctxt.enabled, hps_proc_uint_write_with_lock_reset);
 PROC_FOPS_RW_UINT(heavy_task_enabled, hps_ctxt.heavy_task_enabled,
 		  hps_proc_uint_write_with_lock_reset);
-PROC_FOPS_RW_UINT(heavy_task_enabled_EXT, hps_ctxt.heavy_task_enabled_EXT,
-		hps_proc_uint_write_with_lock_reset);
 PROC_FOPS_RW_UINT(suspend_enabled, hps_ctxt.suspend_enabled, hps_proc_uint_write_with_lock);
 PROC_FOPS_RW_UINT(cur_dump_enabled, hps_ctxt.cur_dump_enabled, hps_proc_uint_write_with_lock);
 PROC_FOPS_RW_UINT(stats_dump_enabled, hps_ctxt.stats_dump_enabled, hps_proc_uint_write_with_lock);
@@ -175,6 +172,7 @@ PROC_FOPS_RW_UINT(rush_boost_threshold,
 		  hps_ctxt.rush_boost_threshold, hps_proc_uint_write_with_lock_reset);
 PROC_FOPS_RW_UINT(rush_boost_times, hps_ctxt.rush_boost_times, hps_proc_uint_write_with_lock_reset);
 PROC_FOPS_RW_UINT(tlp_times, hps_ctxt.tlp_times, hps_proc_uint_write_with_lock_reset);
+PROC_FOPS_RW_UINT(power_mode, hps_ctxt.power_mode, hps_proc_uint_write_with_lock_reset);
 
 /***********************************************************
 * procfs callback - algo bound series
@@ -649,7 +647,6 @@ int hps_procfs_init(void)
 		PROC_ENTRY(state),
 		PROC_ENTRY(enabled),
 		PROC_ENTRY(heavy_task_enabled),
-		PROC_ENTRY(heavy_task_enabled_EXT),
 		PROC_ENTRY(suspend_enabled),
 		PROC_ENTRY(cur_dump_enabled),
 		PROC_ENTRY(stats_dump_enabled),
@@ -668,6 +665,7 @@ int hps_procfs_init(void)
 		PROC_ENTRY(num_limit_low_battery),
 		PROC_ENTRY(num_limit_ultra_power_saving),
 		PROC_ENTRY(num_limit_power_serv),
+		PROC_ENTRY(power_mode),
 	};
 
 	hps_warn("hps_procfs_init\n");

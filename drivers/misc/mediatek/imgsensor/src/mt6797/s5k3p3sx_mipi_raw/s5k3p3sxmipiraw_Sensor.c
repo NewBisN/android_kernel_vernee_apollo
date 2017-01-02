@@ -114,7 +114,7 @@ static imgsensor_info_struct imgsensor_info = {
 		.grabwindow_width = 4608,
 		.grabwindow_height = 3456,
 		.mipi_data_lp2hs_settle_dc = 85,
-		.max_framerate = 300,
+		.max_framerate = 600,
 	},
 	.hs_video = {
 		.pclk = 560000000,
@@ -122,7 +122,7 @@ static imgsensor_info_struct imgsensor_info = {
 		.framelength =904,
 		.startx = 0,
 		.starty = 0,
-		.grabwindow_width = 1152,
+		.grabwindow_width = 1544,
 		.grabwindow_height = 870,
 		.mipi_data_lp2hs_settle_dc = 85,
 		.max_framerate = 1200,
@@ -133,8 +133,8 @@ static imgsensor_info_struct imgsensor_info = {
 				  .framelength = 2640,		   //record different mode's framelength
 			.startx = 0,					//record different mode's startx of grabwindow
 			.starty = 0,					//record different mode's starty of grabwindow
-			.grabwindow_width = 2304,		//record different mode's width of grabwindow
-			.grabwindow_height = 1728,		//record different mode's height of grabwindow
+			.grabwindow_width = 2316,		//record different mode's width of grabwindow
+			.grabwindow_height = 1304,		//record different mode's height of grabwindow
 			/*	 following for MIPIDataLowPwr2HighSpeedSettleDelayCount by different scenario	*/
 			.mipi_data_lp2hs_settle_dc = 85,
 			/*	 following for GetDefaultFramerateByScenario()	*/
@@ -147,7 +147,7 @@ static imgsensor_info_struct imgsensor_info = {
 	.ae_shut_delay_frame = 0,
 	.ae_sensor_gain_delay_frame =0,
 	.ae_ispGain_delay_frame = 2,
-	.ihdr_support = 0,	  //1, support; 0,not support
+	.ihdr_support = 1,	  //1, support; 0,not support
 	.ihdr_le_firstline = 0,  //1,le first ; 0, se first
 	.sensor_mode_num = 5,	  //support sensor mode num
 
@@ -157,7 +157,7 @@ static imgsensor_info_struct imgsensor_info = {
 	.hs_video_delay_frame = 3,
 	.slim_video_delay_frame = 3,
 
-	.isp_driving_current = ISP_DRIVING_8MA,
+	.isp_driving_current = ISP_DRIVING_4MA,
 	.sensor_interface_type = SENSOR_INTERFACE_TYPE_MIPI,
 	.mipi_sensor_type = MIPI_OPHY_NCSI2, //0,MIPI_OPHY_NCSI2;  1,MIPI_OPHY_CSI2
 	.mipi_settle_delay_mode = 0, //0,MIPI_SETTLEDELAY_AUTO; 1,MIPI_SETTLEDELAY_MANNUAL
@@ -190,8 +190,8 @@ static SENSOR_WINSIZE_INFO_STRUCT imgsensor_winsize_info[5] =
 {{ 4608, 3456,	  0,	0, 4608, 3456, 2304,  1728, 0000, 0000, 2304,  1728,	  0,	0, 2304, 1728}, // Preview
  { 4608, 3456,	  0,	0, 4608, 3456, 4104,  3062, 0000, 0000, 4608,  3456,	  0,	0, 4608, 3456}, // capture
  { 4608, 3456,	  0,	0, 4608, 3456, 4104,  3062, 0000, 0000, 4608,  3456,	  0,	0, 4608, 3456}, // video
- { 4608, 3480,	  0,	0, 4608, 3480, 1152,   870, 0000, 0000, 1152,  870,       0,    0, 1152, 870}, //hight speed video
- { 4608, 3456,	  0,	0, 4608, 3456, 2304,  1728, 0000, 0000, 2304,  1728,	  0,	0, 2304, 1728}};// slim video
+ { 4608, 3480,	  0,	0, 4608, 3480, 1544,   870, 0000, 0000, 1152,  870,       0,    0, 1544, 870}, //hight speed video
+ { 4608, 3456,	  0,	0, 4608, 3456, 2316,  1304, 0000, 0000, 2304,  1728,	  0,	0, 2316, 1304}};// slim video
 
 
 //no mirror flip
@@ -1179,7 +1179,7 @@ static kal_uint32 get_info(MSDK_SCENARIO_ID_ENUM scenario_id,
 	sensor_info->IHDR_Support = imgsensor_info.ihdr_support;
 	sensor_info->IHDR_LE_FirstLine = imgsensor_info.ihdr_le_firstline;
 	sensor_info->SensorModeNum = imgsensor_info.sensor_mode_num;
-	sensor_info->PDAF_Support = 1;/*0: NO PDAF, 1: PDAF Raw Data mode, 2:PDAF Virtual Channel mode*/
+	sensor_info->PDAF_Support = 1; /*0: NO PDAF, 1: PDAF Raw Data mode, 2:PDAF Virtual Channel mode*/
 	sensor_info->SensorMIPILaneNumber = imgsensor_info.mipi_lane_num;
 	sensor_info->SensorClockFreq = imgsensor_info.mclk;
 	sensor_info->SensorClockDividCount = 3; /* not use */

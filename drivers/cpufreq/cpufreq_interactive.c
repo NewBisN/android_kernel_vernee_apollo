@@ -36,7 +36,7 @@
 #endif
 
 #ifdef CONFIG_ARCH_MT6797
-#include <../misc/mediatek/base/power/mt6797/mt_cpufreq.h>
+#include <../../drivers/misc/mediatek/base/power/mt6797/mt_cpufreq.h>
 #endif
 
 #if (defined CONFIG_ARCH_MT6755) || (defined CONFIG_ARCH_MT6797)
@@ -78,7 +78,7 @@ static spinlock_t speedchange_cpumask_lock;
 static struct mutex gov_lock;
 
 /* Target load.  Lower values result in higher CPU speeds. */
-#define DEFAULT_TARGET_LOAD 85
+#define DEFAULT_TARGET_LOAD 90
 static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
 
 #define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
@@ -91,7 +91,7 @@ struct cpufreq_interactive_tunables {
 	/* Hi speed to bump to from lo speed when load burst (default max) */
 	unsigned int hispeed_freq;
 	/* Go to hi speed when CPU load at or above this value. */
-#define DEFAULT_GO_HISPEED_LOAD 95
+#define DEFAULT_GO_HISPEED_LOAD 99
 	unsigned long go_hispeed_load;
 	/* Target load. Lower values result in higher CPU speeds. */
 	spinlock_t target_loads_lock;

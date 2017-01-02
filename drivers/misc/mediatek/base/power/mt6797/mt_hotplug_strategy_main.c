@@ -1,3 +1,15 @@
+/*
+ * Copyright (C) 2016 MediaTek Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See http://www.gnu.org/licenses/gpl-2.0.html for more details.
+ */
 /**
 * @file    mt_hotplug_strategy_main.c
 * @brief   hotplug strategy(hps) - main
@@ -91,13 +103,8 @@ hps_ctxt_t hps_ctxt = {
 	.suspend_enabled = 1,
 	.cur_dump_enabled = 0,
 	.stats_dump_enabled = 0,
-#ifdef CONFIG_BIG_OFF
-	.heavy_task_enabled = 0,
-	.heavy_task_enabled_EXT = 0,
-#else
+	.is_ppm_init = 0,
 	.heavy_task_enabled = 1,
-	.heavy_task_enabled_EXT = 1,
-#endif
 	/* core */
 	.lock = __MUTEX_INITIALIZER(hps_ctxt.lock),	/* Synchronizes accesses to loads statistics */
 	.break_lock = __MUTEX_INITIALIZER(hps_ctxt.break_lock),	/* Synchronizes accesses to control break of hps */
@@ -219,7 +226,6 @@ void hps_ctxt_reset_stas_nolock(void)
 		hps_ctxt.up_threshold = 95;
 		hps_ctxt.rush_boost_enabled = 0;
 		hps_ctxt.heavy_task_enabled = 0;
-		hps_ctxt.heavy_task_enabled_EXT = 0;
 		break;
 	case 2:		/*Just make mode */
 	case 3:		/*Performance mode */
@@ -229,7 +235,6 @@ void hps_ctxt_reset_stas_nolock(void)
 		hps_ctxt.up_threshold = 95;
 		hps_ctxt.rush_boost_enabled = 1;
 		hps_ctxt.heavy_task_enabled = 1;
-		hps_ctxt.heavy_task_enabled_EXT = 1;
 		break;
 	default:
 		break;
@@ -421,9 +426,7 @@ static int hps_probe(struct platform_device *pdev)
  */
 static int hps_suspend(struct device *dev)
 {
-#ifndef CONFIG_BIG_OFF
 	int cpu = 9;
-#endif
 
 	hps_warn("%s\n", __func__);
 
@@ -443,7 +446,6 @@ suspend_end:
 		 hps_ctxt.state, hps_ctxt.enabled,
 		 hps_ctxt.suspend_enabled, hps_ctxt.rush_boost_enabled);
 
-#ifndef CONFIG_BIG_OFF
 	/* offline big cores only */
 	cpu_hotplug_enable();
 	for (cpu = 9; cpu >= 8; cpu--) {
@@ -451,7 +453,6 @@ suspend_end:
 			cpu_down(cpu);
 	}
 	cpu_hotplug_disable();
-#endif
 
 	return 0;
 }

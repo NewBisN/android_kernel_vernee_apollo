@@ -31,8 +31,7 @@ extern "C" {
 #include <linux/sched.h>
 
 #include "mach/mt_ppm_api.h"
-#include "mt_ppm_platform.h"
-
+#include "../src/mach/mt6797/mt_ppm_platform.h"
 /*==============================================================*/
 /* Definitions							*/
 /*==============================================================*/
@@ -349,6 +348,7 @@ struct ppm_power_state_data {
 extern struct ppm_data ppm_main_info;
 extern struct ppm_hica_algo_data ppm_hica_algo_data;
 extern struct proc_dir_entry *policy_dir;
+extern struct proc_dir_entry *profile_dir;
 extern unsigned int ppm_func_lv_mask;
 extern unsigned int ppm_debug;
 extern met_set_ppm_state_funcMET g_pSet_PPM_State;

@@ -1,6 +1,14 @@
-/**
-* @file    mt_hotplug_strategy_internal.h
-* @brief   hotplug strategy(hps) - internal header file
+/*
+ * Copyright (C) 2016 MediaTek Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See http://www.gnu.org/licenses/gpl-2.0.html for more details.
 */
 
 #ifndef __MT_HOTPLUG_STRATEGY_INTERNAL_H__
@@ -106,6 +114,10 @@
 /* #define STEP_BY_STEP_DEBUG
 	hps_debug("@@@### file:%s, func:%s, line:%d ###@@@\n", __FILE__, __func__, __LINE__) */
 
+#define CPUHP_INTERVAL          (5LL * NSEC_PER_SEC)
+
+extern struct hrtimer cpuhp_timer;
+
 /*=============================================================*/
 /* Type definition */
 /*=============================================================*/
@@ -147,7 +159,8 @@ typedef enum {
 	HPS_FUNC_CTRL_HPS,	/* bit  0, 0x0001 */
 	HPS_FUNC_CTRL_RUSH,	/* bit  1, 0x0002 */
 	HPS_FUNC_CTRL_HVY_TSK,	/* bit  2, 0x0004 */
-	HPS_FUNC_CTRL_HVY_TSK_EXT, /* bit 3, 0x0008*/
+	HPS_FUNC_CTRL_PPM_INIT,	/* big  3, 0x0008 */
+	HPS_FUNC_CTRL_EFUSE,	/* big  4, 0x0010 */
 	HPS_FUNC_CTRL_COUNT
 } hps_ctxt_func_ctrl_e;
 
@@ -206,7 +219,7 @@ typedef struct hps_ctxt_struct {
 	unsigned int power_mode;
 	unsigned int ppm_power_mode;
 	unsigned int heavy_task_enabled;
-	unsigned int heavy_task_enabled_EXT;
+	unsigned int is_ppm_init;
 	unsigned int hps_func_control;
 	/* core */
 	struct mutex lock;	/* Synchronizes accesses */
@@ -378,7 +391,6 @@ extern int hps_cpu_get_tlp(unsigned int *avg, unsigned int *iowait_avg);
 #ifdef CONFIG_MTK_SCHED_RQAVG_US
 extern unsigned int sched_get_nr_heavy_task2(int cluster_id);
 #endif
-
 extern int get_avg_heavy_task_threshold(void);
 extern int get_heavy_task_threshold(void);
 extern unsigned int sched_get_nr_heavy_task_by_threshold(int cluster_id, unsigned int threshold);
