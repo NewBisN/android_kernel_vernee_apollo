@@ -25,7 +25,7 @@ Aka.jiang    2013-12-14    Init    aka.jiang@hotmail.com
 #define HALL_DEBUG_MASK_SYS (1 << 1)
 
 
-#define HALL_DEBUG_ON
+//#define HALL_DEBUG_ON
 
 #ifdef HALL_DEBUG_ON
     #define HALL_DEBUG_TAG                  "[HALL] "
