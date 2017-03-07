@@ -55,8 +55,15 @@ static void hall_work(struct work_struct *work)
 {
     struct hall_info *info = container_of(work, struct hall_info, work);
     int state;
+    int temp;
 
-    state = !!gpio_get_value(info->irq_gpio);
+    temp = !!gpio_get_value(info->irq_gpio);
+    if(temp == 1)
+    {
+        state = 0;
+    } else {
+        state = 1;
+    }
 
     HALL_DEBUG_LOG("state = %d", state);
     input_report_switch(info->idev, info->sw_code, state);
@@ -265,4 +272,3 @@ module_exit(hall_exit);
 MODULE_DESCRIPTION("Prowave Hall driver");
 MODULE_AUTHOR("Aka.Jiang <aka.jiang@hotmail.com>");
 MODULE_LICENSE("GPL");
-
