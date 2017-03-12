@@ -15,6 +15,7 @@ Aka.jiang    2013-12-14    Init    aka.jiang@hotmail.com
 #include <linux/of_irq.h>
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
+#include <linux/input/hall_enabler.h>
 
 
 #define HALL_NAME "cover"
@@ -57,8 +58,14 @@ static void hall_work(struct work_struct *work)
     int state;
     int temp;
 
-    temp = !!gpio_get_value(info->irq_gpio);
-    if(temp == 1)
+    if (hall_enable() == 1)
+    {
+        temp = !!gpio_get_value(info->irq_gpio);
+    } else {
+        temp = 1;
+    }
+
+    if (temp == 1)
     {
         state = 0;
     } else {
