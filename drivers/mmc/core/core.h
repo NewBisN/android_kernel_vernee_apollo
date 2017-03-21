@@ -83,6 +83,9 @@ void mmc_add_card_debugfs(struct mmc_card *card);
 void mmc_remove_card_debugfs(struct mmc_card *card);
 
 void mmc_init_context_info(struct mmc_host *host);
+
+int mmc_execute_tuning(struct mmc_card *card);
+
 #ifdef CONFIG_MTK_EMMC_CQ_SUPPORT
 void mmc_wait_cmdq_empty(struct mmc_host *host);
 int mmc_blk_cmdq_switch_tmp(struct mmc_card *card, int enable);
